@@ -23,8 +23,13 @@ otherCarPic = transform.scale(otherCarPic, (50, 50))
 logPic = image.load("log.png")
 logPic = transform.scale(logPic, (50, 50))
 
-# Create lists for cars and logs
+rockPic = image.load("rock.png")
+rockPic = transform.scale(rockPic, (50, 50))
 
+woodPic = image.load("wood.png")
+woodPic = transform.scale(woodPic, (50, 50))
+
+# Create lists for cars and logs and rocks
 cars = []
 y = 600
 while y >= 450:
@@ -34,17 +39,15 @@ while y >= 450:
         cars.append(carRect)
         x -= 150
     y -= 150
-
 otherCars = []
 o = 550 
-while o >= 500:
+while o >= 550:
     x = 0 
     while x <= 1200:
         otherCarRect = Rect(x, o, 50, 50)
         otherCars.append(otherCarRect)
         x += 150
     o -= 50 
-
 logs = []
 l = 300
 while l >= 150:
@@ -54,6 +57,24 @@ while l >= 150:
         logs.append(logRect)
         x -= 150
     l -= 150
+rocks = []
+r = 350
+while r >= 200:
+    x = 1200
+    while x >= 0:
+        rockRect = Rect(x, r, 50, 50)
+        rocks.append(rockRect)
+        x -= 150
+    r -= 100
+woods = []
+w = 200
+while w >= 200:
+    x = 1200
+    while x >= 0:
+        woodRect = Rect(x, w, 50, 50)
+        woods.append(woodRect)
+        x -= 150
+    w -= 100
 
 # Game loop
 endGame = False
@@ -61,7 +82,6 @@ while not endGame:
     for e in event.get():
         if e.type == QUIT:
             endGame = True
-
         if e.type == KEYUP:
             if e.key == K_w:
                 frogRect.move_ip(0, -50)
@@ -69,6 +89,13 @@ while not endGame:
                 frogRect.move_ip(-50, 0)
             if e.key == K_d:
                 frogRect.move_ip(50, 0)
+	  # check collisions
+    for c in cars:
+      if c.colliderect(frogRect):
+        endGame = True
+    for o in otherCars:
+      if o.colliderect(frogRect):
+        endGame = True
 
     screen.fill((0, 0, 0))
     
@@ -83,34 +110,41 @@ while not endGame:
 
     # Move cars to the left
     for car in cars:
-        car.x -= 2  
+        car.x -= 5
         if car.x < -50:  
             car.x = width 
-    
     # Move other cars to the right
     for otherCar in otherCars:
         otherCar.x += 5  
         if otherCar.x > width:  
             otherCar.x = -50 
-
     # Move logs to the left
     for log in logs:
         log.x -= 5  
         if log.x < -50:  
             log.x = width 
+	# Move rocks to the right
+    for rock in rocks:
+        rock.x += 3  
+        if rock.x > width:  
+            rock.x = -rock.width
+    for wood in woods:
+        wood.x += 5  
+        if wood.x > width:  
+            wood.x = -wood.width 
 
     # Draw the frog, cars and logs
-    
     screen.blit(frogPic, frogRect)
-
     for car in cars:
         screen.blit(carPic, car)
-
     for otherCar in otherCars:
         screen.blit(otherCarPic, otherCar)
-
     for log in logs:
         screen.blit(logPic, log)
+    for rock in rocks:
+        screen.blit(rockPic, rock)
+    for wood in woods:
+        screen.blit(woodPic, wood)
 
     display.update()
     time.delay(30)
