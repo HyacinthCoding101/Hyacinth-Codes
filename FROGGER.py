@@ -24,7 +24,7 @@ logPic = image.load("log.png")
 logPic = transform.scale(logPic, (50, 50))
 
 rockPic = image.load("rock.png")
-rockPic = transform.scale(rockPic, (50, 50))
+rockPic = transform.scale(rockPic, (60, 60))
 
 woodPic = image.load("wood.png")
 woodPic = transform.scale(woodPic, (50, 50))
@@ -92,10 +92,19 @@ while not endGame:
 	  # check collisions
     for c in cars:
       if c.colliderect(frogRect):
-        endGame = True
+        endGame = False
     for o in otherCars:
       if o.colliderect(frogRect):
-        endGame = True
+        endGame = False
+    for l in logs:
+      if l.colliderect(frogRect):
+        frogRect.move_ip(-log_speed, 0)
+    for r in rocks:
+      if r.colliderect(frogRect):
+        frogRect.move_ip(rock_speed, 0)
+    for w in woods:
+      if w.colliderect(frogRect):
+        frogRect.move_ip(wood_speed, 0)
 
     screen.fill((0, 0, 0))
     
@@ -109,42 +118,47 @@ while not endGame:
     draw.rect(screen, (0, 88, 255), (0, 150, width, 200))
 
     # Move cars to the left
+    car_speed = 5
+    otherCar_speed = 5
+    log_speed = 5
+    rock_speed = 3
+    wood_speed = 3
     for car in cars:
-        car.x -= 5
+        car.x -= car_speed
         if car.x < -50:  
             car.x = width 
     # Move other cars to the right
     for otherCar in otherCars:
-        otherCar.x += 5  
+        otherCar.x += otherCar_speed  
         if otherCar.x > width:  
             otherCar.x = -50 
     # Move logs to the left
     for log in logs:
-        log.x -= 5  
+        log.x -= log_speed  
         if log.x < -50:  
             log.x = width 
 	# Move rocks to the right
     for rock in rocks:
-        rock.x += 3  
+        rock.x += rock_speed  
         if rock.x > width:  
             rock.x = -rock.width
     for wood in woods:
-        wood.x += 5  
+        wood.x += wood_speed  
         if wood.x > width:  
             wood.x = -wood.width 
 
     # Draw the frog, cars and logs
-    screen.blit(frogPic, frogRect)
-    for car in cars:
-        screen.blit(carPic, car)
-    for otherCar in otherCars:
-        screen.blit(otherCarPic, otherCar)
     for log in logs:
         screen.blit(logPic, log)
     for rock in rocks:
         screen.blit(rockPic, rock)
     for wood in woods:
         screen.blit(woodPic, wood)
+    screen.blit(frogPic, frogRect)
+    for car in cars:
+        screen.blit(carPic, car)
+    for otherCar in otherCars:
+        screen.blit(otherCarPic, otherCar)
 
     display.update()
     time.delay(30)
