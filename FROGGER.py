@@ -134,7 +134,7 @@ while not endGame:
     draw.rect(screen, (0, 88, 255), (0, 300, width, 100))
     draw.rect(screen, (0, 88, 255), (0, 150, width, 200))
 
-    # Move cars and logs
+    # Move cars, logs, rocks and wood
     car_speed = 3
     otherCar_speed = 5
     log_speed = 5
@@ -184,7 +184,7 @@ while not endGame:
     display.update()
     time.delay(30)
 
-# Game over screen (optional)
+# Game over screen
 screen.fill((0, 0, 0))
 game_over_text = timer_font.render("Game Over!", True, (255, 0, 0))
 screen.blit(game_over_text, (width // 2 - 70, height // 2 - 20))
