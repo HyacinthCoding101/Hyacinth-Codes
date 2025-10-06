@@ -15,3 +15,5 @@ for a in client.list_aggs(
     aggs.append(a)
 
 print(aggs)
+
+https://polygon.io/blog/build-a-stock-app-with-polygon-io-and-streamlit
