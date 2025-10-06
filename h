@@ -1,23 +1,15 @@
 import requests
 
-# Your FMP API key
-API_KEY = "YOUR_API_KEY_HERE"
+# Your API key
+api_key = "jaBTaztirF6uau1w7EOlBiosi8YqSEEn"
 
-# Example: Get real-time quote for Apple
-symbol = "AAPL"
-url = f"https://financialmodelingprep.com/api/v3/quote/{symbol}?apikey={API_KEY}"
+# Example: Get company profile for Apple (AAPL)
+url = f"https://financialmodelingprep.com/api/v3/profile/AAPL?apikey={api_key}"
 
-# Send request
 response = requests.get(url)
 
-# Convert to JSON
-data = response.json()
-
-# Print stock info
-if data:
-    stock = data[0]
-    print(f"Symbol: {stock['symbol']}")
-    print(f"Price: ${stock['price']}")
-    print(f"Change: {stock['change']} ({stock['changesPercentage']}%)")
+if response.status_code == 200:
+    data = response.json()
+    print(data)
 else:
-    print("No data found.")
+    print("Error:", response.status_code)
