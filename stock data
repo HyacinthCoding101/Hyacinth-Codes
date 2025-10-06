@@ -1,0 +1,17 @@
+from polygon import RESTClient
+
+client = RESTClient("pN75FO95MQmyMF8xzNj1Ayc3Ev606t02")
+
+aggs = []
+
+for a in client.list_aggs(
+    "BE",
+    1,
+    "minute",
+    "2025-01-01",
+    "2025-02-03",
+    limit=50000,
+):
+    aggs.append(a)
+
+print(aggs)
