@@ -17,3 +17,28 @@ for a in client.list_aggs(
 print(aggs)
 
 https://polygon.io/blog/build-a-stock-app-with-polygon-io-and-streamlit
+
+from polygon import RESTClient
+import tkinter as tk
+
+class WelcomeScreen:
+    def __init__(self, header):
+        self.header = header
+    def display(self):
+        window = tk.Tk()
+        window.title("Stock Market Simulator")
+        # sets the window title to "Stock Market Simulator
+        screen_width = window.winfo_screenwidth()
+        screen_height = window.winfo_screenheight()
+        # 
+        window.geometry(f"{screen_width}x{screen_height}+0+0")
+        #
+        tk.Label(window, text=self.header, font=("Abadi", 36)).pack(expand = True)
+		#
+        window.mainloop()
+
+# Create and display the welcome screen
+welcome = WelcomeScreen("Welcome To Hyacinth's Stock Market Simulator!")
+welcome.display()
+
+https://tkinter-docs.readthedocs.io/en/latest/widgets/common.html?utm_source=chatgpt.com
