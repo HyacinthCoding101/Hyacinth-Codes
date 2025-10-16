@@ -30,15 +30,17 @@ class WelcomeScreen:
         # sets the window title to "Stock Market Simulator
         screen_width = window.winfo_screenwidth()
         screen_height = window.winfo_screenheight()
-        # 
+        # sets the app to your screen wdith and height
         window.geometry(f"{screen_width}x{screen_height}+0+0")
-        #
+        # sets the app in full screen
         tk.Label(window, text=self.header, font=("Abadi", 36)).pack(expand = True)
-		#
         window.mainloop()
 
 # Create and display the welcome screen
 welcome = WelcomeScreen("Welcome To Hyacinth's Stock Market Simulator!")
 welcome.display()
+
+
+
 
 https://tkinter-docs.readthedocs.io/en/latest/widgets/common.html?utm_source=chatgpt.com
