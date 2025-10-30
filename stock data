@@ -44,3 +44,42 @@ welcome.display()
 
 
 https://tkinter-docs.readthedocs.io/en/latest/widgets/common.html?utm_source=chatgpt.com
+
+from polygon import RESTClient
+import tkinter as tk
+
+class NextButton:
+    def __init__(self, next_button):
+        self.next_button = next_button
+        self.button = tk.Button(
+            next_button,
+            text = "Next",
+            font = ("Abadi", 20),
+            command = self.open_new_page
+        )
+        self.button.pack(pady=20)
+
+    def open_new_page(self):        
+        # Open a new window
+        new_window = tk.Toplevel()
+        new_window.title("Stock Market Simulator")
+        screen_width = new_window.winfo_screenwidth()
+        screen_height = new_window.winfo_screenheight()
+        new_window.geometry(f"{screen_width}x{screen_height}+0+0")
+
+class WelcomeScreen:
+    def __init__(self, message):
+        self.message = message
+
+    def display(self):
+        window = tk.Tk()
+        window.title("Stock Market Simulator")
+        screen_width = window.winfo_screenwidth()
+        screen_height = window.winfo_screenheight()
+        window.geometry(f"{screen_width}x{screen_height}+0+0")
+        tk.Label(window, text = self.message, font = ("Abadi", 36)).pack(pady = 50)
+        NextButton(window)
+        window.mainloop()
+
+welcome = WelcomeScreen("Click 'Next' to continue.")
+welcome.display()
