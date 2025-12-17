@@ -83,3 +83,59 @@ class WelcomeScreen:
 
 welcome = WelcomeScreen("Click 'Next' to continue.")
 welcome.display()
+
+
+
+from polygon import RESTClient
+import tkinter as tk
+
+class NextButton:
+    def __init__(self, next_button):
+        self.next_button = next_button
+        
+        self.button = tk.Button(
+            next_button,
+            text = "Next",  # button label
+            font = ("Abadi", 20),  # font style/size
+            command = self.open_new_page  # call this method on click
+        )
+        self.button.pack(pady = 20)  # display button with vertical spacing
+
+    def open_new_page(self):        
+        new_window = tk.Toplevel()  # open new window
+        new_window.title("Stock Market Simulator")  # window title
+        screen_width = new_window.winfo_screenwidth()  # get screen width
+        screen_height = new_window.winfo_screenheight()  # get screen height
+        new_window.geometry(f"{screen_width}x{screen_height}+0+0")  # fullscreen
+        new_window.configure(bg = "blue")  # set background color
+        AccountBalance(new_window, 0.00)  # show initial balance
+
+class WelcomeScreen:
+    def __init__(self, message):
+        self.message = message
+        window = tk.Tk()  # create first window
+        window.title("Stock Market Simulator")  # set title
+        screen_width = window.winfo_screenwidth()  # get screen width
+        screen_height = window.winfo_screenheight()  # get screen height
+        window.geometry(f"{screen_width}x{screen_height}+0+0")  # fullscreen
+        tk.Label(
+            window,
+            text = self.message,
+            font=("Abadi", 36, "bold")
+        ).pack(pady = 50)  # display welcome message
+        NextButton(window)  # add 'Next' button onto first window
+        window.mainloop()  # start event loop
+
+class AccountBalance:
+    def __init__(self, window, account_balance):
+        self.account_balance = account_balance  # store balance
+        balance_label = tk.Label(
+            window,
+            text = f"Balance: ${self.account_balance:.2f}",  # display balance
+            font=("Abadi", 20, "bold"),
+            fg = "green",  # text color
+            bg = "blue"  # background color
+        )
+        balance_label.pack(anchor = "ne", padx = 20, pady = 20)  # position label
+
+welcome = WelcomeScreen("Click 'Next' to continue.")  # launch welcome screen
