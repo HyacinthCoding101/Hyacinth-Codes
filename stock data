@@ -107,7 +107,7 @@ class NextButton:
         screen_width = new_window.winfo_screenwidth()  # get screen width
         screen_height = new_window.winfo_screenheight()  # get screen height
         new_window.geometry(f"{screen_width}x{screen_height}+0+0")  # fullscreen
-        new_window.configure(bg = "blue")  # set background color
+        new_window.configure(bg = "black")  # set background color
         AccountBalance(new_window, 0.00)  # show initial balance
 
 class WelcomeScreen:
@@ -132,10 +132,11 @@ class AccountBalance:
         balance_label = tk.Label(
             window,
             text = f"Balance: ${self.account_balance:.2f}",  # display balance
-            font=("Abadi", 20, "bold"),
+            font=("Abadi", 25, "bold"),
             fg = "green",  # text color
-            bg = "blue"  # background color
+            bg = "black"  # background color
         )
         balance_label.pack(anchor = "ne", padx = 20, pady = 20)  # position label
 
 welcome = WelcomeScreen("Click 'Next' to continue.")  # launch welcome screen
+
