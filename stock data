@@ -140,3 +140,94 @@ class AccountBalance:
 
 welcome = WelcomeScreen("Click 'Next' to continue.")  # launch welcome screen
 
+
+
+
+
+
+from polygon import RESTClient
+import tkinter as tk
+import random
+
+class NextButton:
+    def __init__(self, next_button):
+        self.next_button = next_button
+        
+        self.button = tk.Button(
+            next_button,
+            text = "Next",  # button label
+            font = ("Abadi", 20),  # font style/size
+            command = self.open_new_page  # call this method on click
+        )
+        self.button.pack(pady = 20)  # display button with vertical spacing
+
+    def open_new_page(self):        
+        new_window = tk.Toplevel()  # open new window
+        new_window.title("Stock Market Simulator")  # window title
+        screen_width = new_window.winfo_screenwidth()  # get screen width
+        screen_height = new_window.winfo_screenheight()  # get screen height
+        new_window.geometry(f"{screen_width}x{screen_height}+0+0")  # fullscreen
+        new_window.configure(bg = "black")  # set background color
+        AccountBalance(new_window, 0.00)  # show initial balance
+
+class WelcomeScreen:
+    def __init__(self, message):
+        self.message = message
+        window = tk.Tk()  # create first window
+        window.title("Stock Market Simulator")  # set title
+        screen_width = window.winfo_screenwidth()  # get screen width
+        screen_height = window.winfo_screenheight()  # get screen height
+        window.geometry(f"{screen_width}x{screen_height}+0+0")  # fullscreen
+        tk.Label(
+            window,
+            text = self.message,
+            font=("Abadi", 36, "bold")
+        ).pack(pady = 50)  # display welcome message
+        NextButton(window)  # add 'Next' button onto first window
+        window.mainloop()  # start event loop
+
+class AccountBalance:
+    def __init__(self, window, account_balance):
+        self.account_balance = account_balance  # store balance
+        balance_label = tk.Label(
+            window,
+            text = f"Balance: ${self.account_balance:.2f}",  # display balance
+            font = ("Abadi", 25, "bold"),
+            fg = "green",  # text color
+            bg = "black"  # background color
+        )
+        balance_label.pack(anchor = "ne", padx = 20, pady = 20)  # position label
+
+def tips():
+	tips = ["Never invest more than you can afford to lose, as crypto markets are extremely volatile",
+			"Start with major coins like Bitcoin (BTC) and Ethereum (ETH) before exploring smaller, riskier altcoins",
+			"Use Dollar-Cost Averaging (DCA) to invest fixed amounts regularly and reduce the impact of price swings",
+			"Set a maximum risk per trade, typically 1% to 2% of your total capital, to prevent a single loss from wiping you out",
+			"Always use stop-loss orders to automatically close losing trades and remove emotional decision-making",
+			"Diversify your portfolio across multiple assets to spread risk and avoid total loss if one coin crashes",
+			"Research fundamentals (DYOR) by reading whitepapers and checking project teams rather than following social media hype",
+			"Store significant holdings in a cold wallet for maximum security away from online exchanges",
+			"Avoid high leverage as it can magnify losses as quickly as gains and lead to rapid liquidation",
+			"Control your emotions and avoid 'Fear of Missing Out' (FOMO) or panic-selling during temporary market dips",
+			"Choose a reputable exchange with high security, strong volume, and regulatory compliance",
+			"Keep a trading journal to record your entry/exit reasons and learn from past mistakes"]
+	random_tips_number = random.randint(0, 11)
+	return tips[random_tips_number]
+	print(tips())
+		
+class topTips:
+	def __init__(self, window):
+		self.top_tips = top_tips
+		top_tips_label = tk.Label(
+			window,
+			text = tips(),
+			font = ("Abadi", 25, "bold"),
+			fg = "green", 
+			bg = "black"
+		)
+		top_tips_label.pack(anchor = "ne", padx = 0, pady = 80)  # position label
+			
+
+welcome = WelcomeScreen("Click 'Next' to continue.")  # launch welcome screen
+
+
