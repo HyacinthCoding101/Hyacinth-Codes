@@ -7,7 +7,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 class TipsBox:
     def __init__(self, window):
         self.window = window
-        # List of trading tips for the simulator
+        # List of trading tips
         self.tips = [
             "Never invest more than you can afford to lose, as crypto markets are extremely volatile",
             "Start with major coins like Bitcoin (BTC) and Ethereum (ETH) before exploring smaller, riskier altcoins",
@@ -51,12 +51,12 @@ class TipsBox:
     def update_tip(self):
         new_tip = random.choice(self.tips) # pick random tip
         self.label.config(text = f"💡 TRADING TIP:\n{new_tip}") # update label text
-        self.window.after(5000, self.update_tip) # call again after 5 seconds
+        self.window.after(5000, self.update_tip) # update tip after every 5 seconds
 
 class Portfolio:
     def __init__(self, window):
         self.window = window
-        # Create a frame for the portfolio on the LEFT
+        # Create a frame for the portfolio
         self.portfolio_frame = tk.Frame(
             window,
             bg = "#1a1a1a", # dark grey background
@@ -85,7 +85,7 @@ class Portfolio:
         colors = ["#4CAF50"]
 
         # Create the matplotlib figure
-        # facecolor matches the frame background
+        # facecolor set to match the frame background
         fig, ax = plt.subplots(figsize = (6, 6), facecolor = "#1a1a1a")
         ax.pie(
             sizes, 
@@ -122,10 +122,10 @@ class NextButton:
         new_window.geometry(f"{screen_width}x{screen_height}+0+0") # fullscreen
         new_window.configure(bg = "black") # set background color
         
-        # Portfolio now loads on the LEFT side
+        # Portfolio
         Portfolio(new_window) 
-        # Balance and Tips load around it
-        AccountBalance(new_window, 10000.00) # added a starting balance
+        # Balance and Tips
+        AccountBalance(new_window, 10000.00) # starting balance
         TipsBox(new_window) 
 
 class WelcomeScreen:
