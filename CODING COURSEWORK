@@ -1,0 +1,159 @@
+from polygon import RESTClient
+import tkinter as tk
+import random
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+
+class TipsBox:
+    def __init__(self, window):
+        self.window = window
+        # List of trading tips for the simulator
+        self.tips = [
+            "Never invest more than you can afford to lose, as crypto markets are extremely volatile",
+            "Start with major coins like Bitcoin (BTC) and Ethereum (ETH) before exploring smaller, riskier altcoins",
+            "Use Dollar-Cost Averaging (DCA) to invest fixed amounts regularly and reduce the impact of price swings",
+            "Set a maximum risk per trade, typically 1% to 2% of your total capital, to prevent a single loss from wiping you out",
+            "Always use stop-loss orders to automatically close losing trades and remove emotional decision-making",
+            "Diversify your portfolio across multiple assets to spread risk and avoid total loss if one coin crashes",
+            "Research fundamentals (DYOR) by reading whitepapers and checking project teams rather than following social media hype",
+            "Store significant holdings in a cold wallet for maximum security away from online exchanges",
+            "Avoid high leverage as it can magnify losses as quickly as gains and lead to rapid liquidation",
+            "Control your emotions and avoid 'Fear of Missing Out' (FOMO) or panic-selling during temporary market dips",
+            "Choose a reputable exchange with high security, strong volume, and regulatory compliance",
+            "Keep a trading journal to record your entry/exit reasons and learn from past mistakes",
+            "Monitor the 'Fear & Greed Index' to gauge overall market sentiment before entering a trade",
+            "Always enable Two-Factor Authentication (2FA) using an app, not SMS, for exchange security",
+            "Beware of 'Pump and Dump' schemes often found in low-cap coins with sudden price spikes",
+            "Understand the difference between Limit orders (set price) and Market orders (instant price)",
+            "Track the Bitcoin Dominance ratio; it often dictates when 'Altcoin Season' begins",
+            "Never share your private keys or 12-word recovery seed phrases with anyone, ever",
+            "Pay attention to 'Halving' cycles, as they historically impact long-term price action",
+            "Verify the smart contract address on a block explorer before swapping on decentralized exchanges",
+            "Technical analysis is a tool for probability, not a crystal ball—always have a backup plan",
+            "Take profits regularly; a trade is only successful once you have realized the gains"
+        ]
+        
+        self.label = tk.Label(
+            window, 
+            text = "", 
+            font = ("Abadi", 12, "italic"),
+            bg = "yellow", # set background color
+            fg = "black", # set text color
+            wraplength = 300, # wrap text
+            padx = 15, 
+            pady = 15,
+            borderwidth = 2,
+            relief = "ridge"
+        )
+        self.label.pack(side = "bottom", anchor = "se", padx = 20, pady = 20) # position in bottom right
+        self.update_tip() # call method to start loop
+
+    def update_tip(self):
+        new_tip = random.choice(self.tips) # pick random tip
+        self.label.config(text = f"💡 TRADING TIP:\n{new_tip}") # update label text
+        self.window.after(5000, self.update_tip) # call again after 5 seconds
+
+class Portfolio:
+    def __init__(self, window):
+        self.window = window
+        # Create a frame for the portfolio on the LEFT
+        self.portfolio_frame = tk.Frame(
+            window,
+            bg = "#1a1a1a", # dark grey background
+            borderwidth = 2,
+            relief = "sunken"
+        )
+        # Pack to the left and fill height and most of the width
+        self.portfolio_frame.pack(side = "left", fill = "both", expand = True, padx = 20, pady = 60)
+        
+        self.header = tk.Label(
+            self.portfolio_frame,
+            text = "PORTFOLIO BREAKDOWN",
+            font = ("Abadi", 24, "bold"),
+            bg = "#1a1a1a",
+            fg = "white"
+        )
+        self.header.pack(pady = 10)
+
+        # Initialize the pie chart
+        self.create_chart()
+
+    def create_chart(self):
+        # Placeholder data for an empty portfolio
+        labels = ["Cash (Empty)"]
+        sizes = [100]
+        colors = ["#4CAF50"]
+
+        # Create the matplotlib figure
+        # facecolor matches the frame background
+        fig, ax = plt.subplots(figsize = (6, 6), facecolor = "#1a1a1a")
+        ax.pie(
+            sizes, 
+            labels = labels, 
+            colors = colors, 
+            autopct = "%1.1f%%", 
+            startangle = 140,
+            textprops = {"color": "w"} # Make labels white
+        )
+        ax.axis("equal") # ensures pie is a circle
+
+        # Embed the chart into the Tkinter window
+        self.canvas = FigureCanvasTkAgg(fig, master = self.portfolio_frame)
+        self.canvas.draw()
+        self.canvas.get_tk_widget().pack(fill = "both", expand = True, padx = 10, pady = 10)
+
+class NextButton:
+    def __init__(self, next_button):
+        self.next_button = next_button
+        
+        self.button = tk.Button(
+            next_button,
+            text = "Next", # button label
+            font = ("Abadi", 20), # font style/size
+            command = self.open_new_page # call this method on click
+        )
+        self.button.pack(pady = 20) # display button with vertical spacing
+
+    def open_new_page(self):
+        new_window = tk.Toplevel() # open new window
+        new_window.title("Stock Market Simulator") # window title
+        screen_width = new_window.winfo_screenwidth() # get screen width
+        screen_height = new_window.winfo_screenheight() # get screen height
+        new_window.geometry(f"{screen_width}x{screen_height}+0+0") # fullscreen
+        new_window.configure(bg = "black") # set background color
+        
+        # Portfolio now loads on the LEFT side
+        Portfolio(new_window) 
+        # Balance and Tips load around it
+        AccountBalance(new_window, 10000.00) # added a starting balance
+        TipsBox(new_window) 
+
+class WelcomeScreen:
+    def __init__(self, message):
+        self.message = message
+        window = tk.Tk() # create first window
+        window.title("Stock Market Simulator") # set title
+        screen_width = window.winfo_screenwidth() # get screen width
+        screen_height = window.winfo_screenheight() # get screen height
+        window.geometry(f"{screen_width}x{screen_height}+0+0") # fullscreen
+        tk.Label(
+            window,
+            text = self.message,
+            font = ("Abadi", 36, "bold")
+        ).pack(pady = 50) # display welcome message
+        NextButton(window) # add 'Next' button onto first window
+        window.mainloop() # start event loop
+
+class AccountBalance:
+    def __init__(self, window, account_balance):
+        self.account_balance = account_balance # store balance
+        balance_label = tk.Label(
+            window,
+            text = f"Balance: ${self.account_balance:.2f}", # display balance
+            font = ("Abadi", 20, "bold"),
+            fg = "green", # text color
+            bg = "black" # background color
+        )
+        balance_label.pack(anchor = "ne", padx = 20, pady = 20) # position label
+
+welcome = WelcomeScreen("Click 'Next' to continue.") # launch welcome screen
