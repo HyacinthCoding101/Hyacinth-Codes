@@ -231,3 +231,24 @@ class topTips:
 welcome = WelcomeScreen("Click 'Next' to continue.")  # launch welcome screen
 
 
+
+
+
+data = [4,7,3,5,3,2,7,8,9,3,6,1,5,9]
+
+def merge(data, low, mid, high):
+    print(f"Merging on low = {low}, mid = {mid}, high = {high}")
+    leftList = data[low:mid + 1]
+    rightList = data[mid + 1:high + 1]
+    print(leftList, rightList)
+
+def mergeSort(data, low, high):
+    if low < high:
+        mid = (low + high) // 2 
+        print(f"Mergesort on low = {low}, mid = {mid}, high = {high}")
+        mergeSort(data, low, mid) # left
+        mergeSort(data, mid + 1, high) # right
+        merge(data, low, mid, high)
+mergeSort(data, 0, len(data) - 1)
+
+
