@@ -1,44 +1,45 @@
 from polygon import RESTClient
 import tkinter as tk
+from tkinter import messagebox
 import random
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from datetime import datetime, timedelta
+
+# API Key and Client setup
+API_KEY = "mC6_4EhTkdkvX_XTrpycmUybFQfCReAa"
+client = RESTClient(API_KEY)
+
+class TradingSystem:
+    def __init__(self):
+        self.balance = 10000.00 # starting cash
+        self.history = ["Account opened with $10,000"] # starting history
+        self.portfolio = {} # dictionary for stocks owned
+
+sim_data = TradingSystem() # shared data instance
 
 class TipsBox:
     def __init__(self, window):
         self.window = window
-        # List of trading tips
         self.tips = [
-            "Never invest more than you can afford to lose, as crypto markets are extremely volatile",
-            "Start with major coins like Bitcoin (BTC) and Ethereum (ETH) before exploring smaller, riskier altcoins",
-            "Use Dollar-Cost Averaging (DCA) to invest fixed amounts regularly and reduce the impact of price swings",
-            "Set a maximum risk per trade, typically 1% to 2% of your total capital, to prevent a single loss from wiping you out",
-            "Always use stop-loss orders to automatically close losing trades and remove emotional decision-making",
-            "Diversify your portfolio across multiple assets to spread risk and avoid total loss if one coin crashes",
-            "Research fundamentals (DYOR) by reading whitepapers and checking project teams rather than following social media hype",
-            "Store significant holdings in a cold wallet for maximum security away from online exchanges",
-            "Avoid high leverage as it can magnify losses as quickly as gains and lead to rapid liquidation",
-            "Control your emotions and avoid 'Fear of Missing Out' (FOMO) or panic-selling during temporary market dips",
-            "Choose a reputable exchange with high security, strong volume, and regulatory compliance",
-            "Keep a trading journal to record your entry/exit reasons and learn from past mistakes",
-            "Monitor the 'Fear & Greed Index' to gauge overall market sentiment before entering a trade",
-            "Always enable Two-Factor Authentication (2FA) using an app, not SMS, for exchange security",
-            "Beware of 'Pump and Dump' schemes often found in low-cap coins with sudden price spikes",
-            "Understand the difference between Limit orders (set price) and Market orders (instant price)",
-            "Track the Bitcoin Dominance ratio; it often dictates when 'Altcoin Season' begins",
-            "Never share your private keys or 12-word recovery seed phrases with anyone, ever",
-            "Pay attention to 'Halving' cycles, as they historically impact long-term price action",
-            "Verify the smart contract address on a block explorer before swapping on decentralized exchanges",
-            "Technical analysis is a tool for probability, not a crystal ball—always have a backup plan",
-            "Take profits regularly; a trade is only successful once you have realized the gains"
+            "Never invest more than you can afford to lose, as markets are volatile",
+            "Start with major stocks before exploring smaller, riskier ones",
+            "Use Dollar-Cost Averaging (DCA) to reduce the impact of price swings",
+            "Set a maximum risk per trade, typically 1% to 2% of your capital",
+            "Always use stop-loss orders to remove emotional decision-making",
+            "Diversify your portfolio to spread risk",
+            "Research fundamentals before investing",
+            "Avoid high leverage as it can magnify losses",
+            "Control your emotions and avoid panic-selling",
+            "Keep a trading journal to learn from mistakes"
         ]
         
         self.label = tk.Label(
             window, 
             text = "", 
-            font = ("Abadi", 12, "italic"),
-            bg = "yellow", # set background color
-            fg = "black", # set text color
+            font = ("Abadi", 12, "italic"), # font style/size
+            bg = "yellow", # set background colour
+            fg = "black", # set text colour
             wraplength = 300, # wrap text
             padx = 15, 
             pady = 15,
@@ -46,114 +47,221 @@ class TipsBox:
             relief = "ridge"
         )
         self.label.pack(side = "bottom", anchor = "se", padx = 20, pady = 20) # position in bottom right
-        self.update_tip() # call method to start loop
+        self.update_tip() 
 
     def update_tip(self):
         new_tip = random.choice(self.tips) # pick random tip
         self.label.config(text = f"💡 TRADING TIP:\n{new_tip}") # update label text
-        self.window.after(5000, self.update_tip) # update tip after every 5 seconds
+        self.window.after(5000, self.update_tip) # call again after 5 seconds
 
 class Portfolio:
     def __init__(self, window):
         self.window = window
-        # Create a frame for the portfolio
         self.portfolio_frame = tk.Frame(
             window,
             bg = "#1a1a1a", # dark grey background
             borderwidth = 2,
             relief = "sunken"
         )
-        # Pack to the left and fill height and most of the width
-        self.portfolio_frame.pack(side = "left", fill = "both", expand = True, padx = 20, pady = 60)
+        self.portfolio_frame.pack(side = "left", fill = "both", expand = True, padx = 20, pady = 60) # position on left
         
         self.header = tk.Label(
             self.portfolio_frame,
             text = "PORTFOLIO BREAKDOWN",
-            font = ("Abadi", 24, "bold"),
-            bg = "#1a1a1a",
-            fg = "white"
+            font = ("Abadi", 24, "bold"), # font style/size
+            bg = "#1a1a1a", # set background colour
+            fg = "white" # set text colour
         )
         self.header.pack(pady = 10)
-
-        # Initialize the pie chart
-        self.create_chart()
+        self.create_chart() # start chart generation
 
     def create_chart(self):
-        # Placeholder data for an empty portfolio
-        labels = ["Cash (Empty)"]
-        sizes = [100]
-        colors = ["#4CAF50"]
+        if not sim_data.portfolio or all(v == 0 for v in sim_data.portfolio.values()):
+            labels = ["Cash"] # show cash only if empty
+            sizes = [100]
+        else:
+            labels = ["Cash"] + [k for k, v in sim_data.portfolio.items() if v > 0] # add stock names
+            sizes = [sim_data.balance] + [v * 100 for k, v in sim_data.portfolio.items() if v > 0] # add sizes
 
-        # Create the matplotlib figure
-        # facecolor set to match the frame background
-        fig, ax = plt.subplots(figsize = (6, 6), facecolor = "#1a1a1a")
-        ax.pie(
-            sizes, 
-            labels = labels, 
-            colors = colors, 
-            autopct = "%1.1f%%", 
-            startangle = 140,
-            textprops = {"color": "w"} # Make labels white
-        )
-        ax.axis("equal") # ensures pie is a circle
-
-        # Embed the chart into the Tkinter window
-        self.canvas = FigureCanvasTkAgg(fig, master = self.portfolio_frame)
+        colors = ["#4CAF50", "#2196F3", "#9C27B0", "#FF9800", "#E91E63"]
+        fig, ax = plt.subplots(figsize = (5, 5), facecolor = "#1a1a1a") # create plot area
+        ax.pie(sizes, labels = labels, colors = colors, autopct = "%1.1f%%", startangle = 140, textprops = {"color": "w"})
+        ax.axis("equal") # keep chart circular
+        self.canvas = FigureCanvasTkAgg(fig, master = self.portfolio_frame) # place chart in frame
         self.canvas.draw()
         self.canvas.get_tk_widget().pack(fill = "both", expand = True, padx = 10, pady = 10)
 
+class RecentTransactions:
+    def __init__(self, window):
+        self.window = window
+        self.frame = tk.Frame(window, bg = "black") # container frame
+        self.frame.pack(anchor = "ne", padx = 25, pady = (0, 10)) # position top right
+        self.title = tk.Label(self.frame, text = "Recent Transactions:", font = ("Abadi", 14, "bold"), fg = "white", bg = "black")
+        self.title.pack(anchor = "center") 
+        transaction_text = "\n".join(sim_data.history[-5:]) # show last 5 items
+        self.display_label = tk.Label(self.frame, text = transaction_text, font = ("Abadi", 12), fg = "lightgrey", bg = "black", justify = "center")
+        self.display_label.pack(anchor = "center", pady = 5) 
+
+class AccountBalance:
+    def __init__(self, window):
+        self.label = tk.Label(window, text = f"Balance: ${sim_data.balance:.2f}", font = ("Abadi", 20, "bold"), fg = "green", bg = "black")
+        self.label.pack(anchor = "ne", padx = 20, pady = (20, 0)) # position top right
+
+class StocksPage:
+    def __init__(self, window):
+        self.window = window
+        self.current_price = 0 # store price for trade
+        self.current_ticker = "" # store ticker for trade
+
+        tk.Label(window, text = "STOCK SEARCH", font = ("Abadi", 28, "bold"), fg = "white", bg = "black").pack(pady = 10)
+        self.search_entry = tk.Entry(window, font = ("Abadi", 16)) # user input box
+        self.search_entry.pack(pady = 5)
+        tk.Button(window, text = "Search", font = ("Abadi", 14), command = self.search_stock).pack(pady = 5)
+
+        self.qty_frame = tk.Frame(window, bg = "black")
+        self.qty_frame.pack(pady = 5)
+        tk.Label(self.qty_frame, text = "Quantity:", font = ("Abadi", 12), fg = "white", bg = "black").pack(side="left")
+        self.qty_entry = tk.Entry(self.qty_frame, font = ("Abadi", 12), width = 5)
+        self.qty_entry.insert(0, "1") # default quantity
+        self.qty_entry.pack(side="left", padx = 5)
+
+        self.trade_frame = tk.Frame(window, bg = "black") # container for buttons
+        self.trade_frame.pack(pady = 10)
+
+        self.buy_btn = tk.Button(self.trade_frame, text = "BUY", bg = "green", fg = "white", font = ("Abadi", 12, "bold"), command = self.buy_stock, state = "disabled")
+        self.buy_btn.pack(side = "left", padx = 10) # buy button
+
+        self.sell_btn = tk.Button(self.trade_frame, text = "SELL", bg = "red", fg = "white", font = ("Abadi", 12, "bold"), command = self.sell_stock, state = "disabled")
+        self.sell_btn.pack(side = "left", padx = 10) # sell button
+
+        self.graph_frame = tk.Frame(window, bg = "black") # frame for graph
+        self.graph_frame.pack(fill = "both", expand = True)
+
+    def get_qty(self):
+        try:
+            qty = int(self.qty_entry.get()) # point to quantity input
+            if qty <= 0: return 0
+            return qty
+        except ValueError:
+            return 0 
+
+    def search_stock(self):
+        ticker = self.search_entry.get().upper().strip() # get ticker text
+        if not ticker: return
+        try:
+            end_date = datetime.today()
+            start_date = end_date - timedelta(days=30) 
+            aggs = list(client.get_aggs(ticker, 1, "day", start_date.strftime("%Y-%m-%d"), end_date.strftime("%Y-%m-%d")))
+            
+            if len(aggs) == 0:
+                messagebox.showerror("Error", "Stock ticker not found.")
+                return
+
+            self.current_price = aggs[-1].close # save price
+            self.current_ticker = ticker # save ticker
+            self.buy_btn.config(state = "normal") # enable buy
+            self.sell_btn.config(state = "normal") # enable sell
+
+            dates = [datetime.fromtimestamp(agg.timestamp / 1000) for agg in aggs]
+            prices = [agg.close for agg in aggs] 
+            self.plot_graph(ticker, dates, prices) # call plot method
+        except Exception:
+            messagebox.showerror("Error", "API issue or invalid ticker.")
+
+    def buy_stock(self):
+        qty = self.get_qty()
+        if qty == 0:
+            messagebox.showwarning("Warning", "Enter a valid quantity!")
+            return
+            
+        total_cost = self.current_price * qty # calculate total cost
+        if sim_data.balance >= total_cost:
+            sim_data.balance -= total_cost # subtract money
+            sim_data.history.append(f"Bought {qty} {self.current_ticker} @ ${self.current_price:.2f}") # log trade
+            sim_data.portfolio[self.current_ticker] = sim_data.portfolio.get(self.current_ticker, 0) + qty # update shares
+            messagebox.showinfo("Success", f"Purchased {qty} shares of {self.current_ticker}")
+        else:
+            messagebox.showwarning("Failed", "Insufficient funds!") 
+
+    def sell_stock(self):
+        qty = self.get_qty()
+        owned = sim_data.portfolio.get(self.current_ticker, 0)
+        
+        if qty == 0:
+            messagebox.showwarning("Warning", "Enter a valid quantity!")
+            return
+
+        if owned >= qty:
+            sim_data.balance += (self.current_price * qty) # add sale money
+            sim_data.history.append(f"Sold {qty} {self.current_ticker} @ ${self.current_price:.2f}") # log trade
+            sim_data.portfolio[self.current_ticker] -= qty # subtract shares
+            messagebox.showinfo("Success", f"Sold {qty} shares of {self.current_ticker}")
+        else:
+            messagebox.showwarning("Failed", f"You only own {owned} shares!") 
+
+    def plot_graph(self, ticker, dates, prices):
+        for widget in self.graph_frame.winfo_children():
+            widget.destroy() # clear old graph
+        fig, ax = plt.subplots(figsize = (8, 4), facecolor = "black") # create black plot
+        ax.plot(dates, prices, color="#00ff00") # plot line in green
+        ax.set_title(f"{ticker} Price: ${self.current_price:.2f}", color = "white") # set title
+        ax.tick_params(colors = "white") # set axis to white
+        canvas = FigureCanvasTkAgg(fig, master = self.graph_frame) # show in tkinter
+        canvas.draw()
+        canvas.get_tk_widget().pack(fill = "both", expand = True)
+
 class NextButton:
     def __init__(self, next_button):
-        self.next_button = next_button
-        
-        self.button = tk.Button(
-            next_button,
-            text = "Next", # button label
-            font = ("Abadi", 20), # font style/size
-            command = self.open_new_page # call this method on click
-        )
-        self.button.pack(pady = 20) # display button with vertical spacing
+        self.button = tk.Button(next_button, text = "Next", font = ("Abadi", 20), command = self.open_new_page)
+        self.button.pack(pady = 20) # display button
 
     def open_new_page(self):
         new_window = tk.Toplevel() # open new window
-        new_window.title("Stock Market Simulator") # window title
-        screen_width = new_window.winfo_screenwidth() # get screen width
-        screen_height = new_window.winfo_screenheight() # get screen height
+        new_window.title("Stock Market Simulator")
+        screen_width = new_window.winfo_screenwidth()
+        screen_height = new_window.winfo_screenheight()
         new_window.geometry(f"{screen_width}x{screen_height}+0+0") # fullscreen
-        new_window.configure(bg = "black") # set background color
+        new_window.configure(bg = "black")
+        nav_frame = tk.Frame(new_window, bg = "grey") # top nav bar
+        nav_frame.pack(side = "top", fill = "x")
         
-        # Portfolio
-        Portfolio(new_window) 
-        # Balance and Tips
-        AccountBalance(new_window, 10000.00) # starting balance
-        TipsBox(new_window) 
+        home_frame = tk.Frame(new_window, bg = "black") # home page container
+        stocks_frame = tk.Frame(new_window, bg = "black") # stocks page container
+        home_frame.pack(fill = "both", expand = True) # show home first
+
+        def refresh_home():
+            for widget in home_frame.winfo_children(): widget.destroy() # clear home
+            Portfolio(home_frame) # reload portfolio
+            AccountBalance(home_frame) # reload balance
+            RecentTransactions(home_frame) # reload history
+            TipsBox(home_frame) # reload tips
+
+        def show_home():
+            plt.close('all') # save memory
+            stocks_frame.pack_forget() # hide stocks
+            refresh_home() # update data
+            home_frame.pack(fill = "both", expand = True) # show home
+
+        def show_stocks():
+            plt.close('all') # save memory
+            home_frame.pack_forget() # hide home
+            stocks_frame.pack(fill = "both", expand = True) # show stocks
+
+        refresh_home() # initial load
+        StocksPage(stocks_frame) # initial load
+
+        tk.Button(nav_frame, text="HOME PAGE", font=("Abadi", 14), command=show_home).pack(side="left", padx=10, pady=10)
+        tk.Button(nav_frame, text="STOCKS PAGE", font=("Abadi", 14), command=show_stocks).pack(side="left", padx=10, pady=10)
 
 class WelcomeScreen:
     def __init__(self, message):
-        self.message = message
-        window = tk.Tk() # create first window
-        window.title("Stock Market Simulator") # set title
-        screen_width = window.winfo_screenwidth() # get screen width
-        screen_height = window.winfo_screenheight() # get screen height
+        window = tk.Tk() # create root window
+        window.title("Stock Market Simulator")
+        screen_width = window.winfo_screenwidth()
+        screen_height = window.winfo_screenheight()
         window.geometry(f"{screen_width}x{screen_height}+0+0") # fullscreen
-        tk.Label(
-            window,
-            text = self.message,
-            font = ("Abadi", 36, "bold")
-        ).pack(pady = 50) # display welcome message
-        NextButton(window) # add 'Next' button onto first window
-        window.mainloop() # start event loop
+        tk.Label(window, text = message, font = ("Abadi", 36, "bold")).pack(pady = 50)
+        NextButton(window) # add button
+        window.mainloop() # start loop
 
-class AccountBalance:
-    def __init__(self, window, account_balance):
-        self.account_balance = account_balance # store balance
-        balance_label = tk.Label(
-            window,
-            text = f"Balance: ${self.account_balance:.2f}", # display balance
-            font = ("Abadi", 20, "bold"),
-            fg = "green", # text color
-            bg = "black" # background color
-        )
-        balance_label.pack(anchor = "ne", padx = 20, pady = 20) # position label
-
-welcome = WelcomeScreen("Click 'Next' to continue.") # launch welcome screen
+welcome = WelcomeScreen("Click 'Next' to continue.")
