@@ -47,7 +47,7 @@ class TipsBox:
             relief = "ridge"
         )
         self.label.pack(side = "bottom", anchor = "se", padx = 20, pady = 20) # position in bottom right
-        self.update_tip() 
+        self.update_tip() # call method to start loop
 
     def update_tip(self):
         new_tip = random.choice(self.tips) # pick random tip
@@ -104,7 +104,13 @@ class RecentTransactions:
 
 class AccountBalance:
     def __init__(self, window):
-        self.label = tk.Label(window, text = f"Balance: ${sim_data.balance:.2f}", font = ("Abadi", 20, "bold"), fg = "green", bg = "black")
+        self.label = tk.Label(
+            window, 
+            text = f"Balance: ${sim_data.balance:.2f}", # display balance
+            font = ("Abadi", 20, "bold"), # font style/size
+            fg = "green", # set text colour
+            bg = "black" # set background colour
+        )
         self.label.pack(anchor = "ne", padx = 20, pady = (20, 0)) # position top right
 
 class StocksPage:
@@ -118,7 +124,7 @@ class StocksPage:
         self.search_entry.pack(pady = 5)
         tk.Button(window, text = "Search", font = ("Abadi", 14), command = self.search_stock).pack(pady = 5)
 
-        self.qty_frame = tk.Frame(window, bg = "black")
+        self.qty_frame = tk.Frame(window, bg = "black") # container for quantity
         self.qty_frame.pack(pady = 5)
         tk.Label(self.qty_frame, text = "Quantity:", font = ("Abadi", 12), fg = "white", bg = "black").pack(side="left")
         self.qty_entry = tk.Entry(self.qty_frame, font = ("Abadi", 12), width = 5)
