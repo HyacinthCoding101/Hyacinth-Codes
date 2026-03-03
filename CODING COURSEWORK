@@ -76,12 +76,14 @@ class Portfolio:
         self.create_chart() # start chart generation
 
     def create_chart(self):
-        if not sim_data.portfolio or all(v == 0 for v in sim_data.portfolio.values()):
+        # Using clear variables instead of k and v
+        if not sim_data.portfolio or all(count == 0 for count in sim_data.portfolio.values()):
             labels = ["Cash"] # show cash only if empty
             sizes = [100]
         else:
-            labels = ["Cash"] + [k for k, v in sim_data.portfolio.items() if v > 0] # add stock names
-            sizes = [sim_data.balance] + [v * 100 for k, v in sim_data.portfolio.items() if v > 0] # add sizes
+            # Descriptive names for keys and values
+            labels = ["Cash"] + [ticker for ticker, count in sim_data.portfolio.items() if count > 0] 
+            sizes = [sim_data.balance] + [count * 100 for ticker, count in sim_data.portfolio.items() if count > 0]
 
         colors = ["#4CAF50", "#2196F3", "#9C27B0", "#FF9800", "#E91E63"]
         fig, ax = plt.subplots(figsize = (5, 5), facecolor = "#1a1a1a") # create plot area
@@ -143,67 +145,67 @@ class StocksPage:
         self.graph_frame = tk.Frame(window, bg = "black") # frame for graph
         self.graph_frame.pack(fill = "both", expand = True)
 
-    def get_qty(self):
+    def get_quantity_value(self):
         try:
-            qty = int(self.qty_entry.get()) # point to quantity input
-            if qty <= 0: return 0
-            return qty
+            quantity = int(self.qty_entry.get()) # point to quantity input
+            if quantity <= 0: return 0
+            return quantity
         except ValueError:
             return 0 
 
     def search_stock(self):
-        ticker = self.search_entry.get().upper().strip() # get ticker text
-        if not ticker: return
+        ticker_symbol = self.search_entry.get().upper().strip() # get ticker text
+        if not ticker_symbol: return
         try:
             end_date = datetime.today()
             start_date = end_date - timedelta(days=30) 
-            aggs = list(client.get_aggs(ticker, 1, "day", start_date.strftime("%Y-%m-%d"), end_date.strftime("%Y-%m-%d")))
+            aggregates = list(client.get_aggs(ticker_symbol, 1, "day", start_date.strftime("%Y-%m-%d"), end_date.strftime("%Y-%m-%d")))
             
-            if len(aggs) == 0:
+            if len(aggregates) == 0:
                 messagebox.showerror("Error", "Stock ticker not found.")
                 return
 
-            self.current_price = aggs[-1].close # save price
-            self.current_ticker = ticker # save ticker
+            self.current_price = aggregates[-1].close # save price
+            self.current_ticker = ticker_symbol # save ticker
             self.buy_btn.config(state = "normal") # enable buy
             self.sell_btn.config(state = "normal") # enable sell
 
-            dates = [datetime.fromtimestamp(agg.timestamp / 1000) for agg in aggs]
-            prices = [agg.close for agg in aggs] 
-            self.plot_graph(ticker, dates, prices) # call plot method
+            dates = [datetime.fromtimestamp(agg.timestamp / 1000) for agg in aggregates]
+            prices = [agg.close for agg in aggregates] 
+            self.plot_graph(ticker_symbol, dates, prices) # call plot method
         except Exception:
             messagebox.showerror("Error", "API issue or invalid ticker.")
 
     def buy_stock(self):
-        qty = self.get_qty()
-        if qty == 0:
+        quantity_to_buy = self.get_quantity_value()
+        if quantity_to_buy == 0:
             messagebox.showwarning("Warning", "Enter a valid quantity!")
             return
             
-        total_cost = self.current_price * qty # calculate total cost
+        total_cost = self.current_price * quantity_to_buy # calculate total cost
         if sim_data.balance >= total_cost:
             sim_data.balance -= total_cost # subtract money
-            sim_data.history.append(f"Bought {qty} {self.current_ticker} @ ${self.current_price:.2f}") # log trade
-            sim_data.portfolio[self.current_ticker] = sim_data.portfolio.get(self.current_ticker, 0) + qty # update shares
-            messagebox.showinfo("Success", f"Purchased {qty} shares of {self.current_ticker}")
+            sim_data.history.append(f"Bought {quantity_to_buy} {self.current_ticker} @ ${self.current_price:.2f}") # log trade
+            sim_data.portfolio[self.current_ticker] = sim_data.portfolio.get(self.current_ticker, 0) + quantity_to_buy # update shares
+            messagebox.showinfo("Success", f"Purchased {quantity_to_buy} shares of {self.current_ticker}")
         else:
             messagebox.showwarning("Failed", "Insufficient funds!") 
 
     def sell_stock(self):
-        qty = self.get_qty()
-        owned = sim_data.portfolio.get(self.current_ticker, 0)
+        quantity_to_sell = self.get_quantity_value()
+        shares_owned = sim_data.portfolio.get(self.current_ticker, 0)
         
-        if qty == 0:
+        if quantity_to_sell == 0:
             messagebox.showwarning("Warning", "Enter a valid quantity!")
             return
 
-        if owned >= qty:
-            sim_data.balance += (self.current_price * qty) # add sale money
-            sim_data.history.append(f"Sold {qty} {self.current_ticker} @ ${self.current_price:.2f}") # log trade
-            sim_data.portfolio[self.current_ticker] -= qty # subtract shares
-            messagebox.showinfo("Success", f"Sold {qty} shares of {self.current_ticker}")
+        if shares_owned >= quantity_to_sell:
+            sim_data.balance += (self.current_price * quantity_to_sell) # add sale money
+            sim_data.history.append(f"Sold {quantity_to_sell} {self.current_ticker} @ ${self.current_price:.2f}") # log trade
+            sim_data.portfolio[self.current_ticker] -= quantity_to_sell # subtract shares
+            messagebox.showinfo("Success", f"Sold {quantity_to_sell} shares of {self.current_ticker}")
         else:
-            messagebox.showwarning("Failed", f"You only own {owned} shares!") 
+            messagebox.showwarning("Failed", f"You only own {shares_owned} shares!") 
 
     def plot_graph(self, ticker, dates, prices):
         for widget in self.graph_frame.winfo_children():
@@ -235,39 +237,40 @@ class NextButton:
         stocks_frame = tk.Frame(new_window, bg = "black") # stocks page container
         home_frame.pack(fill = "both", expand = True) # show home first
 
-        def refresh_home():
+        def refresh_home_data():
             for widget in home_frame.winfo_children(): widget.destroy() # clear home
             Portfolio(home_frame) # reload portfolio
             AccountBalance(home_frame) # reload balance
             RecentTransactions(home_frame) # reload history
             TipsBox(home_frame) # reload tips
 
-        def show_home():
+        def show_home_screen():
             plt.close('all') # save memory
             stocks_frame.pack_forget() # hide stocks
-            refresh_home() # update data
+            refresh_home_data() # update data
             home_frame.pack(fill = "both", expand = True) # show home
 
-        def show_stocks():
+        def show_stocks_screen():
             plt.close('all') # save memory
             home_frame.pack_forget() # hide home
             stocks_frame.pack(fill = "both", expand = True) # show stocks
 
-        refresh_home() # initial load
+        refresh_home_data() # initial load
         StocksPage(stocks_frame) # initial load
 
-        tk.Button(nav_frame, text="HOME PAGE", font=("Abadi", 14), command=show_home).pack(side="left", padx=10, pady=10)
-        tk.Button(nav_frame, text="STOCKS PAGE", font=("Abadi", 14), command=show_stocks).pack(side="left", padx=10, pady=10)
+        tk.Button(nav_frame, text="HOME PAGE", font=("Abadi", 14), command=show_home_screen).pack(side="left", padx=10, pady=10)
+        tk.Button(nav_frame, text="STOCKS PAGE", font=("Abadi", 14), command=show_stocks_screen).pack(side="left", padx=10, pady=10)
 
 class WelcomeScreen:
-    def __init__(self, message):
-        window = tk.Tk() # create root window
-        window.title("Stock Market Simulator")
-        screen_width = window.winfo_screenwidth()
-        screen_height = window.winfo_screenheight()
-        window.geometry(f"{screen_width}x{screen_height}+0+0") # fullscreen
-        tk.Label(window, text = message, font = ("Abadi", 36, "bold")).pack(pady = 50)
-        NextButton(window) # add button
-        window.mainloop() # start loop
+    def __init__(self, welcome_message):
+        root_window = tk.Tk() # create root window
+        root_window.title("Stock Market Simulator")
+        screen_width = root_window.winfo_screenwidth()
+        screen_height = root_window.winfo_screenheight()
+        root_window.geometry(f"{screen_width}x{screen_height}+0+0") # fullscreen
+        tk.Label(root_window, text = welcome_message, font = ("Abadi", 36, "bold")).pack(pady = 50)
+        NextButton(root_window) # add button
+        root_window.mainloop() # start loop
+
 
 welcome = WelcomeScreen("Click 'Next' to continue.")
