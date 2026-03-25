@@ -76,12 +76,10 @@ class Portfolio:
         self.create_chart() # start chart generation
 
     def create_chart(self):
-        # Using clear variables instead of k and v
         if not sim_data.portfolio or all(count == 0 for count in sim_data.portfolio.values()):
             labels = ["Cash"] # show cash only if empty
             sizes = [100]
         else:
-            # Descriptive names for keys and values
             labels = ["Cash"] + [ticker for ticker, count in sim_data.portfolio.items() if count > 0] 
             sizes = [sim_data.balance] + [count * 100 for ticker, count in sim_data.portfolio.items() if count > 0]
 
